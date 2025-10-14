@@ -4,7 +4,9 @@ import de.vandermeer.asciitable.AsciiTable;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.sql.DriverManager;
 import java.sql.SQLOutput;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -291,7 +293,44 @@ public class App {
         } catch (IOException e) { throw new RuntimeException(e); }
     }
 
+    public void testSqlite(){
+        String DB_URL = "jdbc:sqlite:pizza.db";
+
+        // Quando facciamo una connesione ad un database ...
+        // INPUT/OUTPUT
+        // La comunicazione online avviene in questo caso tramite socket ( canale di comunicazione )
+        try{
+            // Da specificare java.sql
+            java.sql.Connection connection = DriverManager.getConnection(DB_URL);
+            if(connection != null){
+                System.out.println("Connessione al Database Sqlite!");
+            }
+
+            String sqlCreateTable = """
+                CREATE TABLE IF NOT EXISTS pizze (
+                    id VARCHAR(50) PRIMARY KEY,
+                    nome VARCHAR(50),
+                    ingredienti VARCHAR(50),
+                    prezzo DOUBLE
+                );
+                """;
+
+            Statement statement = connection.createStatement();
+            statement.execute(sqlCreateTable);
+            System.out.println("Tabella pizze creata con successo!");
+
+            String sqlInsert = "INSERT INTO pizze VALUES (?, ?, ?, ?)";
+            PreparaStatement insertStatement = connection.prepareStatement(sqlInsert);
+            insertStatement.setString();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void run(){
-         menu();
+        testSqlite();
+
+        // menu();
     }
 }
